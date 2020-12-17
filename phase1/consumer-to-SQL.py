@@ -28,14 +28,10 @@ class Transaction(Base):
 class XactionConsumer:
     def __init__(self):
         self.consumer = KafkaConsumer('bank-customer-events',
-               bootstrap_servers=['localhost:9092'],
-               # auto_offset_reset='earliest',
-               value_deserializer=lambda m: loads(m.decode('ascii')))
-        # self.consumer = KafkaConsumer('bank-customer-events',
-        #                               bootstrap_servers=['localhost:9092'],
-        #                               # auto_offset_reset='earliest',
-        #                               value_deserializer=lambda m: loads(m.decode('ascii')))
-        ## These are two python dictionarys
+                                      bootstrap_servers=['localhost:9092'],
+                                      # auto_offset_reset='earliest',
+                                      value_deserializer=lambda m: loads(m.decode('ascii')))
+        # These are two python dictionarys
         # Ledger is the one where all the transaction get posted
         self.ledger = {}
         # custBalances is the one where the current blance of each customer
@@ -53,11 +49,6 @@ class XactionConsumer:
             self.ledger[message['custid']] = message
             # add message to the transaction table in your SQL usinf SQLalchemy
             message_to_sqltable = Transaction(custid=message['custid'], type = message['type'], date=message['date'], amt=message['amt'])
-            # Session = sessionmaker(bind=self.engine)
-            # Session.configure(bind=self.engine)
-            # session = Session()
-            # session.add(message_to_sqltable)
-            # session.commit()
             if message['custid'] not in self.custBalances:
                 self.custBalances[message['custid']] = 0
             if message['type'] == 'dep':
